@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: budgely-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: budgely_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - budgely_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: budgely-backend
+    restart: always
+    environment:
+      PORT: 4005
+      NODE_ENV: production
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/budgely_db?schema=public
+      JWT_SECRET: budgely_production_access_jwt_secret_key_2026
+      JWT_REFRESH_SECRET: budgely_production_refresh_jwt_secret_key_2026
+      JWT_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      FRONTEND_URL: http://localhost:3000
+    ports:
+      - '4005:4005'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: budgely-frontend
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4005/api/v1
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+
+volumes:
+  budgely_pgdata:

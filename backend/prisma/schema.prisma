@@ -1,0 +1,112 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum TrackingType {
+  GENERAL
+  DAILY
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  DEBIT_CARD
+  CREDIT_CARD
+  OTHER
+}
+
+model User {
+  id                 String     @id @default(uuid())
+  email              String     @unique
+  name               String
+  passwordHash       String
+  currency           String     @default("NGN")
+  hashedRefreshToken String?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+  budgets            Budget[]
+  expenses           Expense[]
+  incomes            Income[]
+
+  @@map("users")
+}
+
+model Budget {
+  id          String           @id @default(uuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  month       Int              // 1 - 12
+  year        Int              // e.g. 2026
+  totalIncome Decimal          @db.Decimal(14, 2)
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  categories  BudgetCategory[]
+  expenses    Expense[]
+
+  @@unique([userId, month, year])
+  @@index([userId, year, month])
+  @@map("budgets")
+}
+
+model BudgetCategory {
+  id              String       @id @default(uuid())
+  budgetId        String
+  budget          Budget       @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  name            String
+  description     String?
+  icon            String       @default("Receipt")
+  color           String       @default("#10B981")
+  allocatedAmount Decimal      @db.Decimal(14, 2)
+  trackingType    TrackingType @default(DAILY)
+  isSavings       Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  expenses        Expense[]
+
+  @@index([budgetId])
+  @@map("budget_categories")
+}
+
+model Expense {
+  id               String         @id @default(uuid())
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  budgetId         String
+  budget           Budget         @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  budgetCategoryId String
+  category         BudgetCategory @relation(fields: [budgetCategoryId], references: [id], onDelete: Cascade)
+  amount           Decimal        @db.Decimal(14, 2)
+  description      String
+  expenseDate      DateTime       @db.Date
+  paymentMethod    PaymentMethod  @default(CASH)
+  merchant         String?
+  notes            String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([userId, expenseDate])
+  @@index([budgetId, budgetCategoryId])
+  @@map("expenses")
+}
+
+model Income {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount      Decimal  @db.Decimal(14, 2)
+  source      String
+  date        DateTime @db.Date
+  recurring   Boolean  @default(true)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, date])
+  @@map("incomes")
+}
