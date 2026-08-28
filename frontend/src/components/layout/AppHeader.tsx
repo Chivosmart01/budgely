@@ -104,23 +104,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             <MenuIcon fontSize="small" />
           </IconButton>
 
-          <Box
-            sx={{
-              width: { xs: 32, sm: 38 },
-              height: { xs: 32, sm: 38 },
-              borderRadius: '10px',
-              backgroundColor: '#10B981',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#FFFFFF',
-              fontWeight: 800,
-              fontSize: { xs: '1rem', sm: '1.2rem' },
-              boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)',
-            }}
-          >
-            ₦
-          </Box>
           <Typography
             variant="h6"
             fontWeight={800}
