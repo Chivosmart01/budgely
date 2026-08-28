@@ -8,6 +8,7 @@
     "start:dev": "nest start --watch",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy || prisma db push",
     "prisma:push": "prisma db push",
     "prisma:seed": "ts-node prisma/seed.ts",
     "test": "jest",
