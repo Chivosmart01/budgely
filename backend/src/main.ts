@@ -12,16 +12,47 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Security & logging
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      crossOriginEmbedderPolicy: false,
+    }),
+  );
   app.use(morgan('dev'));
 
-  // CORS
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  // Comprehensive CORS configuration
   app.enableCors({
-    origin: [frontendUrl, 'http://localhost:3000', 'http://127.0.0.1:3000'],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, Postman, server-to-server)
+      if (!origin) return callback(null, true);
+
+      const frontendUrl = process.env.FRONTEND_URL;
+      if (
+        !frontendUrl ||
+        frontendUrl === '*' ||
+        origin.includes('localhost') ||
+        origin.includes('127.0.0.1') ||
+        origin.endsWith('.vercel.app') ||
+        origin.endsWith('.onrender.com') ||
+        origin === frontendUrl.replace(/\/$/, '')
+      ) {
+        return callback(null, true);
+      }
+
+      // Default to allowing the origin
+      return callback(null, true);
+    },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'X-Requested-With',
+      'Origin',
+    ],
+    exposedHeaders: ['Set-Cookie'],
+    optionsSuccessStatus: 204,
   });
 
   // Global prefix
