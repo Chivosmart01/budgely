@@ -12,6 +12,7 @@ import {
   Dashboard as DashboardIcon,
   AccountBalance as BudgetsIcon,
   ReceiptLong as ExpensesIcon,
+  Category as CategoriesIcon,
   Insights as ReportsIcon,
 } from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
@@ -27,6 +28,7 @@ export const MobileNav: React.FC = () => {
   }
 
   const getValue = () => {
+    if (pathname.startsWith('/categories')) return '/categories';
     if (pathname.startsWith('/budgets')) return '/budgets';
     if (pathname.startsWith('/expenses')) return '/expenses';
     if (pathname.startsWith('/reports')) return '/reports';
@@ -43,9 +45,13 @@ export const MobileNav: React.FC = () => {
         zIndex: (theme) => theme.zIndex.drawer + 2,
         borderTop: `1px solid ${theme.palette.divider}`,
         backgroundColor:
-          theme.palette.mode === 'dark' ? '#0B0F19' : '#FFFFFF',
+          theme.palette.mode === 'dark'
+            ? 'rgba(11, 15, 25, 0.92)'
+            : 'rgba(255, 255, 255, 0.92)',
+        backdropFilter: 'blur(16px)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
       }}
-      elevation={3}
+      elevation={4}
     >
       <BottomNavigation
         showLabels
@@ -53,11 +59,40 @@ export const MobileNav: React.FC = () => {
         onChange={(_, newValue) => {
           router.push(newValue);
         }}
+        sx={{
+          bgcolor: 'transparent',
+          height: 60,
+          '& .MuiBottomNavigationAction-root': {
+            minWidth: 'auto',
+            padding: '6px 0',
+            color: 'text.secondary',
+            '&.Mui-selected': {
+              color: 'primary.main',
+              '& .MuiBottomNavigationAction-label': {
+                fontWeight: 700,
+                fontSize: '0.7rem',
+              },
+            },
+            '& .MuiBottomNavigationAction-label': {
+              fontSize: '0.65rem',
+              fontWeight: 500,
+              mt: 0.25,
+            },
+            '& .MuiSvgIcon-root': {
+              fontSize: '1.25rem',
+            },
+          },
+        }}
       >
         <BottomNavigationAction
           label="Dashboard"
           value="/dashboard"
           icon={<DashboardIcon />}
+        />
+        <BottomNavigationAction
+          label="Categories"
+          value="/categories"
+          icon={<CategoriesIcon />}
         />
         <BottomNavigationAction
           label="Budgets"

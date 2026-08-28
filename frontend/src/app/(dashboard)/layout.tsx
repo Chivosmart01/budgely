@@ -6,12 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../stores/authStore';
 import { useBudgetStore } from '../../stores/budgetStore';
 import { AppHeader } from '../../components/layout/AppHeader';
-import { Sidebar, SIDEBAR_WIDTH } from '../../components/layout/Sidebar';
+import { Sidebar } from '../../components/layout/Sidebar';
 import { MobileNav } from '../../components/layout/MobileNav';
 import { AddExpenseDialog } from '../../components/dialogs/AddExpenseDialog';
 import { apiClient } from '../../lib/api-client';
 import { BudgetCategory } from '../../types';
-
 import { PageTransition } from '../../components/layout/PageTransition';
 
 export default function DashboardLayout({
@@ -23,6 +22,7 @@ export default function DashboardLayout({
   const { selectedMonth, selectedYear, refreshTrigger, triggerRefresh } = useBudgetStore();
   const router = useRouter();
 
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [activeBudgetId, setActiveBudgetId] = useState<string | undefined>(undefined);
   const [categories, setCategories] = useState<BudgetCategory[]>([]);
@@ -79,7 +79,11 @@ export default function DashboardLayout({
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Sidebar />
+      {/* Sidebar with Desktop Fixed and Mobile Sliding Drawer */}
+      <Sidebar
+        mobileOpen={mobileSidebarOpen}
+        onCloseMobile={() => setMobileSidebarOpen(false)}
+      />
 
       <Box
         sx={{
@@ -87,16 +91,20 @@ export default function DashboardLayout({
           display: 'flex',
           flexDirection: 'column',
           minWidth: 0,
-          pb: { xs: 8, md: 4 }, // padding for mobile bottom nav
+          pb: { xs: 9, md: 4 }, // padding for mobile bottom nav
         }}
       >
-        <AppHeader onOpenAddExpense={() => setIsAddExpenseOpen(true)} />
+        <AppHeader
+          onOpenAddExpense={() => setIsAddExpenseOpen(true)}
+          onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+        />
 
-        <Container maxWidth="xl" sx={{ mt: 3, mb: 4, px: { xs: 2, sm: 3 }, flexGrow: 1 }}>
+        <Container maxWidth="xl" sx={{ mt: { xs: 2, sm: 3 }, mb: 4, px: { xs: 1.5, sm: 2.5, md: 3 }, flexGrow: 1 }}>
           <PageTransition>{children}</PageTransition>
         </Container>
       </Box>
 
+      {/* Mobile Bottom Navigation */}
       <MobileNav />
 
       {/* Global Add Expense Modal */}

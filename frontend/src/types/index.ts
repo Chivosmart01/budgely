@@ -189,3 +189,10 @@ export interface MonthlyReport {
   }>;
   message?: string;
 }
+
+export interface DailyExpenseData {
+  total: number;
+  count: number;
+  expenses?: Expense[];
+}
+

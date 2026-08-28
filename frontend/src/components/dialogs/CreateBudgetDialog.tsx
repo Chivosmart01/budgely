@@ -184,7 +184,20 @@ export const CreateBudgetDialog: React.FC<CreateBudgetDialogProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{
+        sx: {
+          m: { xs: 1.5, sm: 3 },
+          width: { xs: 'calc(100% - 24px)', sm: 'auto' },
+          borderRadius: { xs: 3, sm: 4 },
+          maxHeight: { xs: '94vh', sm: '90vh' },
+        },
+      }}
+    >
       <DialogTitle sx={{ m: 0, p: 2.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Box>
           <Typography variant="h6" fontWeight={700}>

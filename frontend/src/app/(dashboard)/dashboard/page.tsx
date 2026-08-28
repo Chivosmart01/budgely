@@ -137,17 +137,30 @@ export default function DashboardPage() {
           </Typography>
         </Box>
 
-        {!hasBudget && (
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-            onClick={() => setIsCreateBudgetOpen(true)}
-            sx={{ fontWeight: 700 }}
-          >
-            Create {getMonthName(selectedMonth)} Budget
-          </Button>
-        )}
+        <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+          {hasBudget && (
+            <Button
+              variant="outlined"
+              size="medium"
+              endIcon={<ArrowForward />}
+              onClick={() => router.push('/categories')}
+            >
+              Category Allocations
+            </Button>
+          )}
+
+          {!hasBudget && (
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<Add />}
+              onClick={() => setIsCreateBudgetOpen(true)}
+              sx={{ fontWeight: 700 }}
+            >
+              Create {getMonthName(selectedMonth)} Budget
+            </Button>
+          )}
+        </Box>
       </Box>
 
       {/* Top Warnings Banners */}
@@ -249,137 +262,6 @@ export default function DashboardPage() {
         />
       ) : (
         <>
-          {/* Budget Categories Overview Table */}
-          <Card>
-            <CardContent sx={{ p: 3 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2.5 }}>
-                <Box>
-                  <Typography variant="h6" fontWeight={700}>
-                    Budget Overview & Category Allocations
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Real-time category spending, remaining balances, and calendar trackers
-                  </Typography>
-                </Box>
-
-                <Button
-                  variant="outlined"
-                  size="small"
-                  endIcon={<ArrowForward />}
-                  onClick={() => router.push('/budgets')}
-                >
-                  Manage Budgets
-                </Button>
-              </Box>
-
-              <Table size="medium">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Category</TableCell>
-                    <TableCell align="right">Budgeted</TableCell>
-                    <TableCell align="right">Actual Spent</TableCell>
-                    <TableCell align="right">Remaining</TableCell>
-                    <TableCell sx={{ minWidth: 160 }}>Usage Progress</TableCell>
-                    <TableCell align="center">Status</TableCell>
-                    <TableCell align="right">Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {summary?.categories.map((cat) => (
-                    <TableRow
-                      key={cat.id}
-                      hover
-                      sx={{
-                        cursor: 'pointer',
-                        '&:hover': {
-                          bgcolor: (theme) =>
-                            theme.palette.mode === 'dark'
-                              ? 'rgba(255, 255, 255, 0.02)'
-                              : 'rgba(0, 0, 0, 0.02)',
-                        },
-                      }}
-                      onClick={() => router.push(`/categories/${cat.id}`)}
-                    >
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                          <Box
-                            sx={{
-                              width: 38,
-                              height: 38,
-                              borderRadius: '10px',
-                              backgroundColor: `${cat.color}20`,
-                              color: cat.color,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            }}
-                          >
-                            {getCategoryIcon(cat.icon, 'small')}
-                          </Box>
-                          <Box>
-                            <Typography variant="subtitle2" fontWeight={700}>
-                              {cat.name}
-                            </Typography>
-                            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-                              {cat.isSavings && (
-                                <Chip label="Savings" size="small" color="success" sx={{ height: 18, fontSize: '0.65rem' }} />
-                              )}
-                              <Typography variant="caption" color="text.secondary">
-                                {cat.trackingType === 'DAILY' ? 'Daily Calendar' : 'General'}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Box>
-                      </TableCell>
-
-                      <TableCell align="right">
-                        <Typography variant="body2" fontWeight={600}>
-                          {formatNaira(cat.allocatedAmount)}
-                        </Typography>
-                      </TableCell>
-
-                      <TableCell align="right">
-                        <Typography variant="body2" fontWeight={700} color={cat.spent > cat.allocatedAmount ? 'error.main' : 'text.primary'}>
-                          {formatNaira(cat.spent)}
-                        </Typography>
-                      </TableCell>
-
-                      <TableCell align="right">
-                        <Typography
-                          variant="body2"
-                          fontWeight={700}
-                          sx={{ color: cat.remaining < 0 ? 'error.main' : 'success.main' }}
-                        >
-                          {formatNaira(cat.remaining)}
-                        </Typography>
-                      </TableCell>
-
-                      <TableCell>
-                        <ProgressBar value={cat.usagePercentage} showLabel />
-                      </TableCell>
-
-                      <TableCell align="center">
-                        <StatusBadge status={cat.status} percentage={cat.usagePercentage} />
-                      </TableCell>
-
-                      <TableCell align="right" onClick={(e) => e.stopPropagation()}>
-                        <Tooltip title="Open Category & Expense Calendar">
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => router.push(`/categories/${cat.id}`)}
-                          >
-                            <ArrowForward fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
           {/* Interactive Spending Bar Chart */}
           <ExpenseBarChart
             data={spendingChartData}

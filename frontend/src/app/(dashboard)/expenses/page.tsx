@@ -284,75 +284,159 @@ export default function ExpensesPage() {
               </Typography>
             </Box>
           ) : (
-            <Table size="medium">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Date</TableCell>
-                  <TableCell>Description</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Payment</TableCell>
-                  <TableCell>Merchant</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                  <TableCell align="center" width={70}>Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
+            <>
+              {/* Mobile Expense Cards List (xs/sm) */}
+              <Box sx={{ display: { xs: 'flex', md: 'none' }, flexDirection: 'column', gap: 1.5, p: 2 }}>
                 {expenses.map((exp) => (
-                  <TableRow key={exp.id} hover>
-                    <TableCell sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
-                      {format(new Date(exp.expenseDate), 'MMM d, yyyy')}
-                    </TableCell>
-
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={700}>
-                        {exp.description}
-                      </Typography>
-                      {exp.notes && (
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                          {exp.notes}
-                        </Typography>
-                      )}
-                    </TableCell>
-
-                    <TableCell>
+                  <Card
+                    key={exp.id}
+                    variant="outlined"
+                    sx={{
+                      p: 2,
+                      borderRadius: 3,
+                      border: (theme) => `1px solid ${theme.palette.divider}`,
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark'
+                          ? 'rgba(255, 255, 255, 0.02)'
+                          : 'rgba(0, 0, 0, 0.01)',
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box sx={{ color: exp.category?.color || 'primary.main' }}>
+                        <Box
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: '8px',
+                            backgroundColor: `${exp.category?.color || '#10B981'}20`,
+                            color: exp.category?.color || 'primary.main',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
                           {getCategoryIcon(exp.category?.icon, 'small')}
                         </Box>
-                        <Typography variant="body2" fontWeight={600}>
-                          {exp.category?.name || '—'}
-                        </Typography>
+                        <Box>
+                          <Typography variant="subtitle2" fontWeight={800} sx={{ lineHeight: 1.2 }}>
+                            {exp.description}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {format(new Date(exp.expenseDate), 'MMM d, yyyy')}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </TableCell>
 
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        {getPaymentIcon(exp.paymentMethod)}
-                        <Typography variant="caption" fontWeight={600}>
+                      <Typography variant="subtitle1" fontWeight={900} color="error.main">
+                        -{formatNaira(exp.amount)}
+                      </Typography>
+                    </Box>
+
+                    {exp.notes && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontStyle: 'italic' }}>
+                        {exp.notes}
+                      </Typography>
+                    )}
+
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pt: 1, borderTop: `1px solid ${theme.palette.divider}` }}>
+                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                        <Chip
+                          label={exp.category?.name || 'General'}
+                          size="small"
+                          sx={{
+                            height: 22,
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                            bgcolor: `${exp.category?.color || '#10B981'}15`,
+                            color: exp.category?.color || 'inherit',
+                          }}
+                        />
+                        <Typography variant="caption" color="text.secondary">
                           {exp.paymentMethod.replace('_', ' ')}
                         </Typography>
                       </Box>
-                    </TableCell>
 
-                    <TableCell>
-                      <Typography variant="body2">{exp.merchant || '—'}</Typography>
-                    </TableCell>
-
-                    <TableCell align="right">
-                      <Typography variant="body2" fontWeight={800} color="error.main">
-                        -{formatNaira(exp.amount)}
-                      </Typography>
-                    </TableCell>
-
-                    <TableCell align="center">
                       <IconButton size="small" color="error" onClick={() => setDeleteTargetId(exp.id)}>
                         <DeleteOutline fontSize="small" />
                       </IconButton>
-                    </TableCell>
-                  </TableRow>
+                    </Box>
+                  </Card>
                 ))}
-              </TableBody>
-            </Table>
+              </Box>
+
+              {/* Desktop Table View (md+) */}
+              <Box sx={{ display: { xs: 'none', md: 'block' }, overflowX: 'auto' }}>
+                <Table size="medium">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Date</TableCell>
+                      <TableCell>Description</TableCell>
+                      <TableCell>Category</TableCell>
+                      <TableCell>Payment</TableCell>
+                      <TableCell>Merchant</TableCell>
+                      <TableCell align="right">Amount</TableCell>
+                      <TableCell align="center" width={70}>Action</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {expenses.map((exp) => (
+                      <TableRow key={exp.id} hover>
+                        <TableCell sx={{ fontWeight: 600, whiteSpace: 'nowrap' }}>
+                          {format(new Date(exp.expenseDate), 'MMM d, yyyy')}
+                        </TableCell>
+
+                        <TableCell>
+                          <Typography variant="body2" fontWeight={700}>
+                            {exp.description}
+                          </Typography>
+                          {exp.notes && (
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                              {exp.notes}
+                            </Typography>
+                          )}
+                        </TableCell>
+
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Box sx={{ color: exp.category?.color || 'primary.main' }}>
+                              {getCategoryIcon(exp.category?.icon, 'small')}
+                            </Box>
+                            <Typography variant="body2" fontWeight={600}>
+                              {exp.category?.name || '—'}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            {getPaymentIcon(exp.paymentMethod)}
+                            <Typography variant="caption" fontWeight={600}>
+                              {exp.paymentMethod.replace('_', ' ')}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+
+                        <TableCell>
+                          <Typography variant="body2">{exp.merchant || '—'}</Typography>
+                        </TableCell>
+
+                        <TableCell align="right">
+                          <Typography variant="body2" fontWeight={800} color="error.main">
+                            -{formatNaira(exp.amount)}
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell align="center">
+                          <IconButton size="small" color="error" onClick={() => setDeleteTargetId(exp.id)}>
+                            <DeleteOutline fontSize="small" />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            </>
           )}
 
           <TablePagination

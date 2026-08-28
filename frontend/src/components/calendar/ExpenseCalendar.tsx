@@ -3,13 +3,12 @@
 import React from 'react';
 import {
   Box,
+  Typography,
   Card,
   CardContent,
-  Typography,
   Grid,
-  useTheme,
-  Chip,
   Tooltip,
+  useTheme,
 } from '@mui/material';
 import {
   startOfMonth,
@@ -17,18 +16,18 @@ import {
   startOfWeek,
   endOfWeek,
   eachDayOfInterval,
-  isSameMonth,
-  isSameDay,
-  isToday,
   format,
+  isSameMonth,
+  isToday,
 } from 'date-fns';
-import { formatNaira, getMonthName } from '../../lib/formatters';
+import { DailyExpenseData } from '../../types';
+import { formatNaira } from '../../lib/formatters';
 
 interface ExpenseCalendarProps {
-  month: number; // 1-12
+  month: number;
   year: number;
-  dailyExpenses: Record<string, { total: number; count: number; expenses: any[] }>;
-  onSelectDate: (date: Date, dayData?: { total: number; count: number; expenses: any[] }) => void;
+  dailyExpenses: Record<string, DailyExpenseData>;
+  onSelectDate: (date: Date, dayData?: DailyExpenseData) => void;
   categoryName?: string;
   categoryColor?: string;
 }
@@ -36,26 +35,23 @@ interface ExpenseCalendarProps {
 export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
   month,
   year,
-  dailyExpenses = {},
+  dailyExpenses,
   onSelectDate,
   categoryName,
-  categoryColor = '#10B981',
+  categoryColor,
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
+  // Construct target date from month & year (month is 1-indexed)
   const refDate = new Date(year, month - 1, 1);
   const monthStart = startOfMonth(refDate);
   const monthEnd = endOfMonth(monthStart);
-  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 }); // Start Monday
-  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  const startDate = startOfWeek(monthStart, { weekStartsOn: 0 }); // Sunday
+  const endDate = endOfWeek(monthEnd, { weekStartsOn: 0 });
 
-  const calendarDays = eachDayOfInterval({
-    start: calendarStart,
-    end: calendarEnd,
-  });
-
-  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Calculate highest daily spending in month for relative heatmap intensity
   const spendingValues = Object.values(dailyExpenses).map((d) => d.total);
@@ -78,61 +74,63 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
 
   return (
     <Card sx={{ overflow: 'hidden' }}>
-      <CardContent sx={{ p: 3 }}>
+      <CardContent sx={{ p: { xs: 1.75, sm: 3 } }}>
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
             justifyContent: 'space-between',
+            gap: 1,
             mb: 2.5,
           }}
         >
           <Box>
-            <Typography variant="h6" fontWeight={700}>
+            <Typography variant="h6" fontWeight={700} sx={{ fontSize: { xs: '1.05rem', sm: '1.25rem' } }}>
               {categoryName ? `${categoryName} — Expense Calendar` : 'Daily Expense Calendar'}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              Click any date to view and record daily itemized expenses
+              Tap any date to log or review daily itemized expenses
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, alignSelf: { xs: 'flex-end', sm: 'auto' } }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Box
                 sx={{
-                  width: 10,
-                  height: 10,
+                  width: 8,
+                  height: 8,
                   borderRadius: '3px',
                   bgcolor: isDark ? 'rgba(16, 185, 129, 0.3)' : 'rgba(16, 185, 129, 0.2)',
                 }}
               />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 Low
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Box
                 sx={{
-                  width: 10,
-                  height: 10,
+                  width: 8,
+                  height: 8,
                   borderRadius: '3px',
                   bgcolor: isDark ? 'rgba(245, 158, 11, 0.4)' : 'rgba(245, 158, 11, 0.2)',
                 }}
               />
-              <Typography variant="caption" color="text.secondary">
-                Medium
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
+                Med
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <Box
                 sx={{
-                  width: 10,
-                  height: 10,
+                  width: 8,
+                  height: 8,
                   borderRadius: '3px',
                   bgcolor: isDark ? 'rgba(239, 68, 68, 0.4)' : 'rgba(239, 68, 68, 0.2)',
                 }}
               />
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>
                 High
               </Typography>
             </Box>
@@ -140,14 +138,18 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
         </Box>
 
         {/* Days of Week Header */}
-        <Grid container spacing={1} sx={{ mb: 1, textAlign: 'center' }}>
+        <Grid container spacing={{ xs: 0.5, sm: 1 }} sx={{ mb: 1, textAlign: 'center' }}>
           {weekDays.map((day) => (
             <Grid item xs={12 / 7} key={day}>
               <Typography
                 variant="caption"
                 fontWeight={700}
                 color="text.secondary"
-                sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}
+                sx={{
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                }}
               >
                 {day}
               </Typography>
@@ -156,7 +158,7 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
         </Grid>
 
         {/* Calendar Day Cells */}
-        <Grid container spacing={1}>
+        <Grid container spacing={{ xs: 0.5, sm: 1 }}>
           {calendarDays.map((day) => {
             const dateKey = format(day, 'yyyy-MM-dd');
             const dayData = dailyExpenses[dateKey];
@@ -178,9 +180,9 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
                     className="calendar-cell"
                     onClick={() => onSelectDate(day, dayData)}
                     sx={{
-                      height: { xs: 64, sm: 80 },
-                      p: 1,
-                      borderRadius: 2.5,
+                      height: { xs: 54, sm: 80 },
+                      p: { xs: 0.5, sm: 1 },
+                      borderRadius: { xs: 1.75, sm: 2.5 },
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
@@ -202,6 +204,11 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
                         : 'transparent',
                       opacity: inCurrentMonth ? 1 : 0.35,
                       cursor: 'pointer',
+                      transition: 'transform 0.1s ease, box-shadow 0.1s ease',
+                      '&:hover': {
+                        transform: 'scale(1.03)',
+                        zIndex: 2,
+                      },
                     }}
                   >
                     {/* Top row: day number & indicator */}
@@ -216,6 +223,7 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
                         variant="caption"
                         fontWeight={today ? 800 : inCurrentMonth ? 600 : 400}
                         color={today ? 'primary.main' : 'text.primary'}
+                        sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
                       >
                         {format(day, 'd')}
                       </Typography>
@@ -223,8 +231,8 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
                       {hasSpending && (
                         <Box
                           sx={{
-                            width: 6,
-                            height: 6,
+                            width: { xs: 5, sm: 6 },
+                            height: { xs: 5, sm: 6 },
                             borderRadius: '50%',
                             backgroundColor: categoryColor || 'primary.main',
                           }}
@@ -233,29 +241,32 @@ export const ExpenseCalendar: React.FC<ExpenseCalendarProps> = ({
                     </Box>
 
                     {/* Bottom: total spent on that day */}
-                    <Box sx={{ mt: 'auto' }}>
+                    <Box sx={{ mt: 'auto', textAlign: 'right' }}>
                       {hasSpending ? (
                         <Typography
                           variant="caption"
                           fontWeight={700}
+                          noWrap
                           sx={{
-                            fontSize: { xs: '0.65rem', sm: '0.75rem' },
-                            color: isDark ? '#34D399' : '#059669',
+                            fontSize: { xs: '0.58rem', sm: '0.75rem' },
+                            color: isDark ? '#FCA5A5' : '#DC2626',
                             display: 'block',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
+                            lineHeight: 1.1,
                           }}
                         >
-                          {formatNaira(dayData.total)}
+                          ₦{dayData.total >= 1000 ? `${(dayData.total / 1000).toFixed(0)}k` : dayData.total}
                         </Typography>
                       ) : (
                         <Typography
                           variant="caption"
-                          color="text.disabled"
-                          sx={{ fontSize: '0.65rem' }}
+                          color="text.secondary"
+                          sx={{
+                            fontSize: '0.65rem',
+                            display: { xs: 'none', sm: 'block' },
+                            opacity: 0.3,
+                          }}
                         >
-                          ₦0
+                          —
                         </Typography>
                       )}
                     </Box>

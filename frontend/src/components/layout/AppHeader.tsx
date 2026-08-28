@@ -26,6 +26,7 @@ import {
   Settings,
   Person,
   CalendarMonth,
+  Menu as MenuIcon,
 } from '@mui/icons-material';
 import { useColorMode } from '../../theme/ThemeProvider';
 import { useAuthStore } from '../../stores/authStore';
@@ -35,9 +36,13 @@ import { useRouter } from 'next/navigation';
 
 interface AppHeaderProps {
   onOpenAddExpense: () => void;
+  onOpenMobileSidebar?: () => void;
 }
 
-export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenAddExpense }) => {
+export const AppHeader: React.FC<AppHeaderProps> = ({
+  onOpenAddExpense,
+  onOpenMobileSidebar,
+}) => {
   const theme = useTheme();
   const { mode, toggleColorMode } = useColorMode();
   const { user, logout } = useAuthStore();
@@ -70,19 +75,39 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenAddExpense }) => {
         borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
         backgroundColor: (theme) =>
           theme.palette.mode === 'dark'
-            ? 'rgba(11, 15, 25, 0.85)'
-            : 'rgba(255, 255, 255, 0.85)',
+            ? 'rgba(11, 15, 25, 0.92)'
+            : 'rgba(255, 255, 255, 0.92)',
         backdropFilter: 'blur(12px)',
         zIndex: (theme) => theme.zIndex.drawer + 1,
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, md: 3 } }}>
-        {/* Left: Brand Logo & Title */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+      <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 1.5, sm: 2.5, md: 3 }, minHeight: { xs: 58, sm: 64 } }}>
+        {/* Left: Mobile Hamburger Menu & Brand Logo */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
+          {/* Sliding Sidebar Trigger for Mobile */}
+          <IconButton
+            onClick={onOpenMobileSidebar}
+            size="medium"
+            edge="start"
+            color="inherit"
+            aria-label="open drawer"
+            sx={{
+              display: { xs: 'flex', md: 'none' },
+              p: 1,
+              borderRadius: 2,
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'dark'
+                  ? 'rgba(255, 255, 255, 0.05)'
+                  : 'rgba(0, 0, 0, 0.04)',
+            }}
+          >
+            <MenuIcon fontSize="small" />
+          </IconButton>
+
           <Box
             sx={{
-              width: 38,
-              height: 38,
+              width: { xs: 32, sm: 38 },
+              height: { xs: 32, sm: 38 },
               borderRadius: '10px',
               backgroundColor: '#10B981',
               display: 'flex',
@@ -90,7 +115,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenAddExpense }) => {
               justifyContent: 'center',
               color: '#FFFFFF',
               fontWeight: 800,
-              fontSize: '1.2rem',
+              fontSize: { xs: '1rem', sm: '1.2rem' },
               boxShadow: '0 2px 10px rgba(16, 185, 129, 0.3)',
             }}
           >
@@ -119,11 +144,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenAddExpense }) => {
                 ? 'rgba(255, 255, 255, 0.05)'
                 : 'rgba(0, 0, 0, 0.04)',
             borderRadius: '12px',
-            p: 0.5,
+            p: 0.35,
             border: (theme) => `1px solid ${theme.palette.divider}`,
           }}
         >
-          <IconButton size="small" onClick={prevMonth} sx={{ p: 0.75 }}>
+          <IconButton size="small" onClick={prevMonth} sx={{ p: { xs: 0.5, sm: 0.75 } }}>
             <ChevronLeft fontSize="small" />
           </IconButton>
 
@@ -131,33 +156,52 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenAddExpense }) => {
             sx={{
               display: 'flex',
               alignItems: 'center',
-              gap: 1,
-              px: { xs: 1.5, sm: 2 },
+              gap: { xs: 0.5, sm: 0.75 },
+              px: { xs: 1, sm: 1.75 },
             }}
           >
-            <CalendarMonth fontSize="small" color="primary" />
-            <Typography variant="body2" fontWeight={700} noWrap>
+            <CalendarMonth sx={{ fontSize: { xs: 16, sm: 18 } }} color="primary" />
+            <Typography variant="body2" fontWeight={700} noWrap sx={{ fontSize: { xs: '0.78rem', sm: '0.875rem' } }}>
               {getMonthName(selectedMonth)} {selectedYear}
             </Typography>
           </Box>
 
-          <IconButton size="small" onClick={nextMonth} sx={{ p: 0.75 }}>
+          <IconButton size="small" onClick={nextMonth} sx={{ p: { xs: 0.5, sm: 0.75 } }}>
             <ChevronRight fontSize="small" />
           </IconButton>
         </Box>
 
-        {/* Right: Quick Action + Theme Mode + User Avatar */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+        {/* Right: Quick Add Expense + Theme Mode + User Avatar */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
           <Button
             variant="contained"
             color="primary"
             startIcon={<Add />}
             onClick={onOpenAddExpense}
             size="small"
-            sx={{ display: { xs: 'none', sm: 'flex' }, fontWeight: 700 }}
+            sx={{
+              display: { xs: 'none', sm: 'flex' },
+              fontWeight: 700,
+              borderRadius: 2,
+              px: 1.75,
+            }}
           >
             Add Expense
           </Button>
+
+          {/* Quick Add icon button on mobile */}
+          <IconButton
+            onClick={onOpenAddExpense}
+            color="primary"
+            size="small"
+            sx={{
+              display: { xs: 'flex', sm: 'none' },
+              backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              p: 0.75,
+            }}
+          >
+            <Add fontSize="small" />
+          </IconButton>
 
           <IconButton
             onClick={toggleColorMode}
@@ -168,6 +212,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenAddExpense }) => {
                 theme.palette.mode === 'dark'
                   ? 'rgba(255, 255, 255, 0.05)'
                   : 'rgba(0, 0, 0, 0.04)',
+              p: { xs: 0.75, sm: 1 },
             }}
           >
             {mode === 'dark' ? <Brightness7 fontSize="small" /> : <Brightness4 fontSize="small" />}
@@ -176,8 +221,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ onOpenAddExpense }) => {
           <IconButton onClick={handleMenuOpen} size="small" sx={{ p: 0 }}>
             <Avatar
               sx={{
-                width: 36,
-                height: 36,
+                width: { xs: 32, sm: 36 },
+                height: { xs: 32, sm: 36 },
                 bgcolor: 'primary.main',
                 fontSize: '0.875rem',
                 fontWeight: 700,
