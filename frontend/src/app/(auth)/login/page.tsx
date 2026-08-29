@@ -13,7 +13,7 @@ import {
   Link as MuiLink,
   useTheme,
 } from '@mui/material';
-import { LockOutlined, AutoAwesome } from '@mui/icons-material';
+import { LockOutlined } from '@mui/icons-material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '../../../stores/authStore';
@@ -41,11 +41,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleDemoFill = () => {
-    setEmail('demo@example.com');
-    setPassword('Password123!');
   };
 
   return (
@@ -88,18 +83,6 @@ export default function LoginPage() {
               Plan your salary allocation & track daily expenses
             </Typography>
           </Box>
-
-          {/* Quick Demo Fill Button */}
-          <Button
-            fullWidth
-            variant="outlined"
-            color="primary"
-            startIcon={<AutoAwesome />}
-            onClick={handleDemoFill}
-            sx={{ mb: 2.5, py: 1, borderRadius: 2.5, fontWeight: 700 }}
-          >
-            Quick Fill Demo Account
-          </Button>
 
           {errorMessage && (
             <Alert severity="error" sx={{ mb: 2 }}>

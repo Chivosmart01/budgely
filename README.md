@@ -96,17 +96,11 @@ The Next.js frontend will start on **http://localhost:3000**.
 
 ---
 
-## Demo Account Credentials
+## Getting Started
 
-After running `npm run prisma:seed`, you can immediately log in using:
-- **Email**: `demo@example.com`
-- **Password**: `Password123!`
-
-The seed script provisions:
-- August 2026 Salary Budget (₦500,000 Income)
-- Categories: Savings (₦200,000), Car & Fuel (₦100,000), Daily Expenses (₦100,000), Bills & Utilities (₦50,000), Entertainment (₦50,000)
-- Itemized daily expenses including August 27 (Food ₦2,500, Transport ₦1,000, Airtime ₦500 -> Total ₦4,000)
-- July 2026 historical budget for template duplication and trend comparisons.
+1. Open **http://localhost:3000** in your browser.
+2. Click **Create an Account** to register with your email and password.
+3. Start by creating your first monthly budget and allocating your salary into custom categories.
 
 ---
 

@@ -11,11 +11,9 @@ interface BudgetState {
 }
 
 export const useBudgetStore = create<BudgetState>((set, get) => {
-  // Default to current date or August 2026 for demo context
   const now = new Date();
-  // Using August 2026 default as aligned with demo data, or current
-  const defaultMonth = 8;
-  const defaultYear = 2026;
+  const defaultMonth = now.getMonth() + 1;
+  const defaultYear = now.getFullYear();
 
   return {
     selectedMonth: defaultMonth,
