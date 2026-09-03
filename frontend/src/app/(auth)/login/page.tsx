@@ -101,14 +101,28 @@ export default function LoginPage() {
               autoFocus
             />
 
-            <TextField
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              fullWidth
-              required
-            />
+            <Box>
+              <TextField
+                label="Password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                fullWidth
+                required
+              />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                <MuiLink
+                  component={Link}
+                  href="/forgot-password"
+                  variant="caption"
+                  color="primary.main"
+                  fontWeight={600}
+                  sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                >
+                  Forgot password?
+                </MuiLink>
+              </Box>
+            </Box>
 
             <Button
               type="submit"
@@ -116,7 +130,7 @@ export default function LoginPage() {
               color="primary"
               disabled={isLoading}
               fullWidth
-              sx={{ py: 1.25, fontWeight: 700, mt: 1 }}
+              sx={{ py: 1.25, fontWeight: 700, mt: 0.5 }}
             >
               {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>

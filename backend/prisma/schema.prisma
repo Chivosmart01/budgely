@@ -21,17 +21,19 @@ enum PaymentMethod {
 }
 
 model User {
-  id                 String     @id @default(uuid())
-  email              String     @unique
-  name               String
-  passwordHash       String
-  currency           String     @default("NGN")
-  hashedRefreshToken String?
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-  budgets            Budget[]
-  expenses           Expense[]
-  incomes            Income[]
+  id                   String     @id @default(uuid())
+  email                String     @unique
+  name                 String
+  passwordHash         String
+  currency             String     @default("NGN")
+  hashedRefreshToken   String?
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+  budgets              Budget[]
+  expenses             Expense[]
+  incomes              Income[]
 
   @@map("users")
 }
